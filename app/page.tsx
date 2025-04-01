@@ -1,4 +1,7 @@
 
+
+
+import AboutPage from "./components/about/About";
 import Header from "./components/header/Header";
 import HomePage from "./components/home/Home";
 
@@ -9,6 +12,7 @@ export default function Home() {
       <Header/>
       <main>
         <HomePage/>
+        <AboutPage/>
       </main>
       {/* <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         

@@ -5,9 +5,10 @@ import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 import ThemeToggle from "./ThemeToggle";
+import SearchBar from "../rightside/SearchButton";
 import UserAuthButton from "../rightside/UserAuthButton";
 import CartButton from "../rightside/CardButton";
-import SearchBar from "../rightside/SearchButton";
+
 
 const Header = () => {
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
@@ -23,13 +24,24 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleAboutClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const aboutSection = document.getElementById("about-section");
+    if (aboutSection) {
+      window.scrollTo({
+        top: aboutSection.offsetTop - 100, // Adjust for header height
+        behavior: "smooth"
+      });
+    }
+  };
+
   const laptopBrands = [
     "Apple", "Dell", "HP", "Lenovo", "Asus", 
     "Acer", "MSI", "Razer", "Microsoft", "Samsung"
   ];
 
   return (
-    <header className="fixed w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-50 shadow-sm mb-20">
+    <header className="fixed w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-50 shadow-sm">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Left Side - Logo and Navigation */}
@@ -53,12 +65,13 @@ const Header = () => {
                 Home
               </Link>
 
-              <Link
-                href="/about"
-                className="text-gray-700 dark:text-gray-200 hover:text-cyan-600 dark:hover:text-cyan-400 font-medium"
+              <a 
+                href="#about-section"
+                onClick={handleAboutClick}
+                className="text-gray-700 dark:text-gray-200 hover:text-cyan-600 dark:hover:text-cyan-400 font-medium cursor-pointer"
               >
                 About
-              </Link>
+              </a>
 
               <div className="relative" ref={categoriesRef}>
                 <button
