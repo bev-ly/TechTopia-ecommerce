@@ -9,7 +9,6 @@ import SearchBar from "../rightside/SearchButton";
 import UserAuthButton from "../rightside/UserAuthButton";
 import CartButton from "../rightside/CardButton";
 
-
 const Header = () => {
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const categoriesRef = useRef<HTMLDivElement>(null);
@@ -29,24 +28,22 @@ const Header = () => {
     const aboutSection = document.getElementById("about-section");
     if (aboutSection) {
       window.scrollTo({
-        top: aboutSection.offsetTop - 100, // Adjust for header height
+        top: aboutSection.offsetTop - 100,
         behavior: "smooth"
       });
     }
   };
 
   const laptopBrands = [
-    "Apple", "Dell", "HP", "Lenovo", "Asus", 
-    "Acer", "MSI", "Razer", "Microsoft", "Samsung"
+    "apple", "dell", "hp", "lenovo", "asus", 
+    "acer", "msi", "razer", "microsoft", "samsung"
   ];
 
   return (
     <header className="fixed w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md z-50 shadow-sm">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          {/* Left Side - Logo and Navigation */}
           <div className="flex items-center space-x-12">
-            {/* Logo */}
             <motion.h1
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -56,7 +53,6 @@ const Header = () => {
               <Link href="/">TechTopia</Link>
             </motion.h1>
 
-            {/* Navigation Links */}
             <nav className="hidden md:flex items-center space-x-8">
               <Link 
                 href="/"
@@ -91,11 +87,11 @@ const Header = () => {
                     {laptopBrands.map((brand) => (
                       <Link
                         key={brand}
-                        href={`/products/${brand.toLowerCase()}`}
+                        href={`/products/${brand}`}
                         className="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                         onClick={() => setIsCategoriesOpen(false)}
                       >
-                        {brand}
+                        {brand.charAt(0).toUpperCase() + brand.slice(1)}
                       </Link>
                     ))}
                   </motion.div>
@@ -104,14 +100,11 @@ const Header = () => {
             </nav>
           </div>
 
-          {/* Right Side - Search and Icons */}
           <div className="flex items-center space-x-6">
-            {/* Search Bar - Desktop */}
             <div className="hidden md:block w-64">
               <SearchBar />
             </div>
 
-            {/* Right Side Icons */}
             <div className="flex items-center space-x-4">
               <ThemeToggle />
               <UserAuthButton />

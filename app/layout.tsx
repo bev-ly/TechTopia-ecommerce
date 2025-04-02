@@ -4,6 +4,8 @@ import { ThemeProvider } from "./components/header/theme-provider";
 import type { Metadata, Viewport } from "next";
 import PWAScripts from "./components/pwa-scripts"; 
 import PWAInstallPrompt from "./components/pwa-install-prompt";
+import Header from "./components/header/Header";
+import { CartProvider } from "./context/CartContext";
 
 // Separate viewport export for Next.js 15
 export const viewport: Viewport = {
@@ -42,11 +44,14 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
+      <CartProvider>
+          <Header/>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
           <PWAScripts /> {/* Moved to body */}
           <PWAInstallPrompt />
         </ThemeProvider>
+        </CartProvider>
       </body>
     </html>
   );

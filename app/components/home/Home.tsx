@@ -96,7 +96,7 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             <Link 
-              href="/products" 
+              href="#products" 
               className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-full font-medium hover:opacity-90 transition-opacity"
             >
               Browse Laptops <ArrowRight className="ml-2" size={18} />
