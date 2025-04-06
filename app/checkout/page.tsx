@@ -1,10 +1,11 @@
 "use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart } from 'lucide-react';
+import { useCart } from '@/app/context/CartContext';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ShoppingCart, Truck, CheckCircle, Clock, X, Plus, Minus } from 'lucide-react';
 
 interface CartItem {
   id: string;
@@ -12,24 +13,30 @@ interface CartItem {
   price: number;
   quantity: number;
   image: string;
-  brand: string;
+  brand?: string;
 }
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { placeOrder } = useCart();
   const [checkoutItems, setCheckoutItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [checkoutTotal, setCheckoutTotal] = useState(0);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    address: '',
+    email: '',
+    phone: ''
+  });
 
   useEffect(() => {
-    // Get selected items from session storage
     const storedItems = sessionStorage.getItem('checkoutItems');
     if (storedItems) {
       const items = JSON.parse(storedItems);
       setCheckoutItems(items);
       calculateTotal(items);
     } else {
-      // Redirect back to cart if no items selected
       router.push('/cart');
     }
     setIsLoading(false);
@@ -38,6 +45,28 @@ export default function CheckoutPage() {
   const calculateTotal = (items: CartItem[]) => {
     const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     setCheckoutTotal(total);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handlePlaceOrder = () => {
+    // Basic form validation
+    if (!formData.firstName || !formData.lastName || !formData.address || !formData.email) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    // Place order using cart context
+    placeOrder(checkoutItems);
+    
+    // Clear checkout session
+    sessionStorage.removeItem('checkoutItems');
+    
+    // Redirect to profile page
+    router.push('/profile');
   };
 
   if (isLoading) {
@@ -117,13 +146,41 @@ export default function CheckoutPage() {
                         <h3 className="text-lg font-medium text-gray-800 dark:text-white">
                           {item.name}
                         </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                          Brand: {item.brand}
-                        </p>
-                        <div className="mt-2 flex justify-between items-center">
-                          <p className="text-gray-600 dark:text-gray-300">
-                            Qty: {item.quantity}
+                        {item.brand && (
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            Brand: {item.brand}
                           </p>
+                        )}
+                        <div className="mt-2 flex justify-between items-center">
+                          <div className="flex items-center border border-gray-200 dark:border-gray-600 rounded-md">
+                            <button aria-label='Decrease quantity'
+                              onClick={() => {
+                                const updatedItems = checkoutItems.map(i => 
+                                  i.id === item.id ? {...i, quantity: Math.max(1, i.quantity - 1)} : i
+                                );
+                                setCheckoutItems(updatedItems);
+                                calculateTotal(updatedItems);
+                              }}
+                              className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                            >
+                              <Minus size={16} />
+                            </button>
+                            <span className="px-4 py-1 text-center w-12">
+                              {item.quantity}
+                            </span>
+                            <button aria-label='Increase quantity'
+                              onClick={() => {
+                                const updatedItems = checkoutItems.map(i => 
+                                  i.id === item.id ? {...i, quantity: i.quantity + 1} : i
+                                );
+                                setCheckoutItems(updatedItems);
+                                calculateTotal(updatedItems);
+                              }}
+                              className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                            >
+                              <Plus size={16} />
+                            </button>
+                          </div>
                           <p className="text-lg font-bold text-cyan-600 dark:text-cyan-500">
                             ${(item.price * item.quantity).toLocaleString()}
                           </p>
@@ -142,22 +199,26 @@ export default function CheckoutPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        First Name
+                        First Name *
                       </label>
                       <input
                         type="text"
                         id="firstName"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
                         className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-cyan-500 focus:border-cyan-500 dark:bg-gray-700 dark:text-white"
                         required
                       />
                     </div>
                     <div>
                       <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Last Name
+                        Last Name *
                       </label>
                       <input
                         type="text"
                         id="lastName"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
                         className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-cyan-500 focus:border-cyan-500 dark:bg-gray-700 dark:text-white"
                         required
                       />
@@ -165,16 +226,44 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Address
+                      Address *
                     </label>
                     <input
                       type="text"
                       id="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
                       className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-cyan-500 focus:border-cyan-500 dark:bg-gray-700 dark:text-white"
                       required
                     />
                   </div>
-                  {/* Add more form fields as needed */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Email *
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-cyan-500 focus:border-cyan-500 dark:bg-gray-700 dark:text-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Phone Number
+                      </label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-cyan-500 focus:border-cyan-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                  </div>
                 </form>
               </div>
             </div>
@@ -220,14 +309,12 @@ export default function CheckoutPage() {
                 </div>
               </div>
               <button
+                onClick={handlePlaceOrder}
                 className="w-full px-6 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors duration-200"
-                onClick={() => {
-                  // Handle payment processing here
-                  sessionStorage.removeItem('checkoutItems');
-                  alert('Order placed successfully!');
-                }}
               >
-                Place Order
+                Place Order <Link href="/profile" className="...">
+  My Profile
+</Link>
               </button>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
                 By placing your order, you agree to our Terms of Service
