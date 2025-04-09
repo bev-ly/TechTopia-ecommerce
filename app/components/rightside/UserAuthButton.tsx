@@ -9,7 +9,7 @@ const UserAuthButton = () => {
   return (
     <motion.div whileHover={{ scale: 1.1 }}>
       <Link
-         href="/profile/orders" // Changed from "/auth" to "/profile"
+         href="/profile" // Changed from "/auth" to "/profile"
         className="text-gray-700 dark:text-gray-200 hover:text-cyan-600 dark:hover:text-cyan-400"
         aria-label="User profile"
       >

@@ -3,11 +3,14 @@
 
 import { useCart } from '@/app/context/CartContext';
 import Link from 'next/link';
-import { Truck, CheckCircle, Clock, User, ShoppingBag } from 'lucide-react';
+import { Truck, CheckCircle, Clock, User, ShoppingBag, X } from 'lucide-react';
 import Image from 'next/image';
+import { useState } from 'react';
 
 export default function ProfilePage() {
-  const { orders } = useCart();
+  const { orders, cancelOrder } = useCart();
+  const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
+  const [showCancelConfirm, setShowCancelConfirm] = useState<string | null>(null);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -25,7 +28,18 @@ export default function ProfilePage() {
       case 'processing': return <Clock className="text-yellow-500" size={16} />;
       case 'shipped': return <Truck className="text-blue-500" size={16} />;
       case 'delivered': return <CheckCircle className="text-green-500" size={16} />;
+      case 'cancelled': return <X className="text-red-500" size={16} />;
       default: return <Clock className="text-yellow-500" size={16} />;
+    }
+  };
+
+  const handleCancelOrder = async (orderId: string) => {
+    setCancellingOrderId(orderId);
+    try {
+      await cancelOrder(orderId);
+      setShowCancelConfirm(null);
+    } finally {
+      setCancellingOrderId(null);
     }
   };
 
@@ -70,13 +84,21 @@ export default function ProfilePage() {
           {/* Orders Section */}
           <div className="md:w-2/3">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full">
-                  <ShoppingBag className="text-cyan-600 dark:text-cyan-300" size={24} />
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-cyan-100 dark:bg-cyan-900 rounded-full">
+                    <ShoppingBag className="text-cyan-600 dark:text-cyan-300" size={24} />
+                  </div>
+                  <h1 className="text-xl font-bold text-gray-800 dark:text-white">
+                    Order History
+                  </h1>
                 </div>
-                <h1 className="text-xl font-bold text-gray-800 dark:text-white">
-                  Order History
-                </h1>
+                <Link 
+                  href="/profile/cancel" 
+                  className="text-sm text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
+                >
+                  View Cancelled Orders
+                </Link>
               </div>
 
               {orders.length === 0 ? (
@@ -147,7 +169,7 @@ export default function ProfilePage() {
                           )}
                         </div>
                         
-                        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                           <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">
                               Total paid
@@ -156,12 +178,44 @@ export default function ProfilePage() {
                               ${order.total.toFixed(2)}
                             </p>
                           </div>
-                          <Link
-  href={`/profile/orders/${order.id}`}
-  className="text-sm text-cyan-600 hover:text-cyan-700 dark:text-cyan-500 dark:hover:text-cyan-400"
->
-  View details
-</Link>
+                          <div className="flex gap-3">
+                            <Link
+                              href={`/profile/orders/${order.id}`}
+                              className="text-sm text-cyan-600 hover:text-cyan-700 dark:text-cyan-500 dark:hover:text-cyan-400"
+                            >
+                              View details
+                            </Link>
+                            {order.status === 'processing' && (
+                              <>
+                                {showCancelConfirm === order.id ? (
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => handleCancelOrder(order.id)}
+                                      disabled={cancellingOrderId === order.id}
+                                      className={`text-sm ${cancellingOrderId === order.id 
+                                        ? 'text-gray-400' 
+                                        : 'text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400'}`}
+                                    >
+                                      {cancellingOrderId === order.id ? 'Cancelling...' : 'Confirm'}
+                                    </button>
+                                    <button
+                                      onClick={() => setShowCancelConfirm(null)}
+                                      className="text-sm text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => setShowCancelConfirm(order.id)}
+                                    className="text-sm text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
+                                  >
+                                    Cancel Order
+                                  </button>
+                                )}
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>

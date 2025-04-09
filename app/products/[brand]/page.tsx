@@ -3,19 +3,19 @@ import Loading from '@/app/components/Loading';
 import ProductList from './ProductList';
 import { Suspense } from 'react';
 
-
 export default function BrandPage({ 
   params 
 }: { 
   params: { brand: string } 
 }) {
   return (
-   
-      <div className="min-h-screen pt-24 pb-12">
-      <ProductList brand={params.brand} />
+    <div className="min-h-screen pt-24 pb-12">
+      <Suspense fallback={<Loading />}>
+        <ProductList brand={params.brand} />
+      </Suspense>
     </div>
-    
   );
+}
 
   /**
    * Option 2: With API Integration (When Ready)
@@ -42,4 +42,3 @@ export default function BrandPage({
   //     </div>
   //   );
   // }
-}

@@ -62,7 +62,7 @@ export default function OrderDetailsPage() {
     <div className="min-h-screen pt-24 pb-12 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 sm:px-6">
         <Link 
-          href="/profile/orders" 
+          href="/profile" 
           className="inline-flex items-center text-cyan-600 hover:text-cyan-700 dark:text-cyan-500 dark:hover:text-cyan-400 mb-6"
         >
           <ArrowLeft className="mr-2" size={16} />
