@@ -53,19 +53,13 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = () => {
-    // Basic form validation
     if (!formData.firstName || !formData.lastName || !formData.address || !formData.email) {
       alert('Please fill in all required fields');
       return;
     }
 
-    // Place order using cart context
     placeOrder(checkoutItems);
-    
-    // Clear checkout session
     sessionStorage.removeItem('checkoutItems');
-    
-    // Redirect to profile page
     router.push('/profile');
   };
 
@@ -131,63 +125,81 @@ export default function CheckoutPage() {
                   Order Details
                 </h2>
                 <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                  {checkoutItems.map((item) => (
-                    <div key={item.id} className="py-4 flex">
-                      <div className="relative h-24 w-24 sm:h-32 sm:w-32 flex-shrink-0 rounded-md overflow-hidden bg-gray-100 dark:bg-gray-700">
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          className="object-contain p-2"
-                          sizes="100vw"
-                        />
-                      </div>
-                      <div className="ml-4 sm:ml-6 flex-1">
-                        <h3 className="text-lg font-medium text-gray-800 dark:text-white">
-                          {item.name}
-                        </h3>
-                        {item.brand && (
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                            Brand: {item.brand}
-                          </p>
-                        )}
-                        <div className="mt-2 flex justify-between items-center">
-                          <div className="flex items-center border border-gray-200 dark:border-gray-600 rounded-md">
-                            <button aria-label='Decrease quantity'
-                              onClick={() => {
-                                const updatedItems = checkoutItems.map(i => 
-                                  i.id === item.id ? {...i, quantity: Math.max(1, i.quantity - 1)} : i
-                                );
-                                setCheckoutItems(updatedItems);
-                                calculateTotal(updatedItems);
-                              }}
-                              className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                            >
-                              <Minus size={16} />
-                            </button>
-                            <span className="px-4 py-1 text-center w-12">
-                              {item.quantity}
-                            </span>
-                            <button aria-label='Increase quantity'
-                              onClick={() => {
-                                const updatedItems = checkoutItems.map(i => 
-                                  i.id === item.id ? {...i, quantity: i.quantity + 1} : i
-                                );
-                                setCheckoutItems(updatedItems);
-                                calculateTotal(updatedItems);
-                              }}
-                              className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                            >
-                              <Plus size={16} />
-                            </button>
+                  {checkoutItems.map((item) => {
+                    // Extract color from item name (format: "Product Name (Color)")
+                    const colorMatch = item.name.match(/\(([^)]+)\)$/);
+                    const colorName = colorMatch ? colorMatch[1] : null;
+                    
+                    return (
+                      <div key={item.id} className="py-4 flex">
+                        <div className="relative h-24 w-24 sm:h-32 sm:w-32 flex-shrink-0 rounded-md overflow-hidden bg-gray-100 dark:bg-gray-700">
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            className="object-contain p-2"
+                            sizes="100vw"
+                          />
+                        </div>
+                        <div className="ml-4 sm:ml-6 flex-1">
+                          <h3 className="text-lg font-medium text-gray-800 dark:text-white">
+                            {item.name.replace(/\([^)]*\)$/, '').trim()}
+                          </h3>
+                          {item.brand && (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                              Brand: {item.brand}
+                            </p>
+                          )}
+                          {colorName && (
+                            <div className="flex items-center mt-1">
+                              <span className="text-sm text-gray-500 dark:text-gray-400 mr-2">
+                                Color:
+                              </span>
+                              <span className="text-sm text-gray-700 dark:text-gray-300">
+                                {colorName}
+                              </span>
+                            </div>
+                          )}
+                          <div className="mt-2 flex justify-between items-center">
+                            <div className="flex items-center border border-gray-200 dark:border-gray-600 rounded-md">
+                              <button
+                                onClick={() => {
+                                  const updatedItems = checkoutItems.map(i => 
+                                    i.id === item.id ? {...i, quantity: Math.max(1, i.quantity - 1)} : i
+                                  );
+                                  setCheckoutItems(updatedItems);
+                                  calculateTotal(updatedItems);
+                                }}
+                                className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                aria-label="Decrease quantity"
+                              >
+                                <Minus size={16} />
+                              </button>
+                              <span className="px-4 py-1 text-center w-12">
+                                {item.quantity}
+                              </span>
+                              <button
+                                onClick={() => {
+                                  const updatedItems = checkoutItems.map(i => 
+                                    i.id === item.id ? {...i, quantity: i.quantity + 1} : i
+                                  );
+                                  setCheckoutItems(updatedItems);
+                                  calculateTotal(updatedItems);
+                                }}
+                                className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                aria-label="Increase quantity"
+                              >
+                                <Plus size={16} />
+                              </button>
+                            </div>
+                            <p className="text-lg font-bold text-cyan-600 dark:text-cyan-500">
+                              ${(item.price * item.quantity).toLocaleString()}
+                            </p>
                           </div>
-                          <p className="text-lg font-bold text-cyan-600 dark:text-cyan-500">
-                            ${(item.price * item.quantity).toLocaleString()}
-                          </p>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -312,9 +324,7 @@ export default function CheckoutPage() {
                 onClick={handlePlaceOrder}
                 className="w-full px-6 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-colors duration-200"
               >
-                Place Order <Link href="/profile" className="...">
-  My Profile
-</Link>
+                Place Order
               </button>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
                 By placing your order, you agree to our Terms of Service

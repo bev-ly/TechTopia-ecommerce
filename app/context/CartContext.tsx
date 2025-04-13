@@ -1,7 +1,12 @@
-
 "use client";
 
 import { createContext, useContext, useState, useEffect } from 'react';
+
+export type ColorOption = {
+  name: string;
+  hex: string;
+};
+
 export type CartItem = {
   id: string;
   name: string;
@@ -9,6 +14,7 @@ export type CartItem = {
   image: string;
   brand?: string;
   quantity: number;
+  color?: string;
 };
 
 export type OrderStatus = 'processing' | 'shipped' | 'delivered' | 'cancelled';
@@ -26,7 +32,7 @@ type CartContextType = {
   cart: CartItem[];
   orders: Order[];
   cancelledOrders: Order[];
-  addToCart: (item: Omit<CartItem, 'quantity'>) => void;
+  addToCart: (item: Omit<CartItem, 'quantity'> & { color?: string }) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -37,6 +43,7 @@ type CartContextType = {
   cartTotal: number;
   itemCount: number;
   isInitialized: boolean;
+  
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -47,7 +54,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cancelledOrders, setCancelledOrders] = useState<Order[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Load data from localStorage
   useEffect(() => {
     const loadData = () => {
       try {
@@ -60,7 +66,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (savedCancelledOrders) setCancelledOrders(JSON.parse(savedCancelledOrders));
       } catch (error) {
         console.error('Failed to load cart data:', error);
-        // Reset to empty state if loading fails
         setCart([]);
         setOrders([]);
         setCancelledOrders([]);
@@ -72,7 +77,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     loadData();
   }, []);
 
-  // Save data to localStorage
   useEffect(() => {
     if (isInitialized) {
       localStorage.setItem('cart', JSON.stringify(cart));
@@ -127,7 +131,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     };
     
     setOrders((prevOrders) => [...prevOrders, newOrder]);
-    // Remove ordered items from cart
     setCart((prevCart) => 
       prevCart.filter((cartItem) => 
         !items.some((orderItem) => orderItem.id === cartItem.id)
@@ -141,10 +144,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setOrders(prevOrders => {
       const orderToCancel = prevOrders.find(order => order.id === orderId);
       if (orderToCancel) {
-        // Create new cancelled order with unique ID
         const cancelledOrder = {
           ...orderToCancel,
-          id: `CANCEL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // More unique ID
+          id: `CANCEL-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           status: 'cancelled' as OrderStatus,
           date: new Date().toISOString()
         };
@@ -154,6 +156,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return prevOrders;
     });
   };
+
   const deleteCancelledOrder = (orderId: string) => {
     setCancelledOrders((prev) => 
       prev.filter((order) => order.id !== orderId)
@@ -161,15 +164,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const reorderItems = (items: CartItem[]) => {
-    // Group items by product ID to combine quantities
     const itemsMap = new Map<string, CartItem>();
     
-    // First add existing cart items
     cart.forEach((item) => {
       itemsMap.set(item.id, { ...item });
     });
     
-    // Then add/update with reordered items
     items.forEach((item) => {
       if (itemsMap.has(item.id)) {
         const existingItem = itemsMap.get(item.id)!;
@@ -182,7 +182,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
     });
     
-    // Update cart with merged items
     setCart(Array.from(itemsMap.values()));
   };
 

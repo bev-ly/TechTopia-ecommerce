@@ -8,6 +8,7 @@ import ThemeToggle from "./ThemeToggle";
 import SearchBar from "../rightside/SearchButton";
 import UserAuthButton from "../rightside/UserAuthButton";
 import CartButton from "../rightside/CardButton";
+import Image from "next/image";
 
 const Header = () => {
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
@@ -44,14 +45,26 @@ const Header = () => {
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-12">
-            <motion.h1
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent"
-            >
-              <Link href="/">TechTopia</Link>
-            </motion.h1>
+          <motion.div
+  initial={{ opacity: 0, y: -20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5 }}
+  className="flex items-center space-x-2"
+>
+  <Link href="/" className="flex items-center space-x-2">
+    <Image
+      src="/TechTopia.png"
+      alt="TechTopia Logo"
+      width={40}
+      height={40}
+      priority
+    />
+    {/* <span className="text-2xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+      TechTopia
+    </span> */}
+  </Link>
+</motion.div>
+
 
             <nav className="hidden md:flex items-center space-x-8">
               <Link 
@@ -112,7 +125,9 @@ const Header = () => {
             </div>
           </div>
         </div>
+        
       </div>
+      
     </header>
   );
 };

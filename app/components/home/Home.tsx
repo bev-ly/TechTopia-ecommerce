@@ -10,7 +10,7 @@ export default function HomePage() {
     { 
       name: "Apple MacBook", 
       href: "/products/apple",
-      image: "/brands/apple-logo.png",
+      image: "/apple-logo.png",
       alt: "Apple Logo"
     },
     { 
@@ -51,7 +51,7 @@ export default function HomePage() {
       description: "12-core CPU, 40-core GPU, 64GB unified memory",
       price: "$3,899",
       href: "/products/macbook-pro-16-m3max",
-      image: "/laptops/macbook-pro-16.png"
+      image: "/apple16.webp"
     },
     {
       name: "Dell XPS 15 (2024)",
@@ -96,7 +96,7 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             <Link 
-              href="/products"  // Changed from "#products" to "/products"
+              href="/products"
               className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-full font-medium hover:opacity-90 transition-opacity"
             >
               Browse Laptops <ArrowRight className="ml-2" size={18} />
@@ -120,13 +120,14 @@ export default function HomePage() {
                 className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow"
               >
                 <Link href={brand.href} className="flex flex-col items-center">
-                  <div className="mb-4 h-16 w-16 relative">
+                  <div className="mb-4 h-24 w-24 relative"> {/* Increased size */}
                     <Image 
                       src={brand.image}
                       alt={brand.alt}
                       fill
-                      className="object-contain"
+                      className="object-contain p-2" /* Added padding */
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      priority={index < 3} /* Prioritize first few images */
                     />
                   </div>
                   <h3 className="text-lg font-semibold text-center text-gray-800 dark:text-white">{brand.name}</h3>
@@ -156,8 +157,9 @@ export default function HomePage() {
                     src={laptop.image}
                     alt={laptop.name}
                     fill
-                    className="object-contain p-4"
+                    className="object-contain p-8" /* Increased padding */
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority={index < 2} /* Prioritize first few images */
                   />
                 </div>
                 <div className="p-6">

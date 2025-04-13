@@ -78,7 +78,6 @@ export default function CartPage() {
   const handleCheckout = () => {
     if (selectedItems.size === 0) return;
     
-    // Store selected items in session storage temporarily
     sessionStorage.setItem('checkoutItems', JSON.stringify(getSelectedItems()));
     router.push('/checkout');
   };
@@ -123,84 +122,97 @@ export default function CartPage() {
             <div className="lg:col-span-2 space-y-4">
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
                 <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center">
-                  <input aria-label='Select all items' 
+                  <input 
                     type="checkbox"
                     checked={selectAll}
                     onChange={toggleSelectAll}
                     className="h-5 w-5 text-cyan-600 rounded border-gray-300 focus:ring-cyan-500 mr-3"
+                    aria-label="Select all items"
                   />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Select all items
                   </span>
                 </div>
                 <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                  {cart.map((item) => (
-                    <div key={item.id} className="p-4 sm:p-6 flex">
-                      <div className="flex items-start">
-                        <input aria-label='Select item'
-                          type="checkbox"
-                          checked={selectedItems.has(item.id)}
-                          onChange={() => toggleItemSelection(item.id)}
-                          className="h-5 w-5 text-cyan-600 rounded border-gray-300 focus:ring-cyan-500 mr-3 mt-1"
-                        />
-                        <div className="relative h-24 w-24 sm:h-32 sm:w-32 flex-shrink-0 rounded-md overflow-hidden bg-gray-100 dark:bg-gray-700">
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            fill
-                            className="object-contain p-2"
-                            sizes="100vw"
+                  {cart.map((item) => {
+                    const colorMatch = item.name.match(/\(([^)]+)\)$/);
+                    const colorName = colorMatch ? colorMatch[1] : null;
+                    const displayName = item.name.replace(/\([^)]*\)$/, '').trim();
+                    
+                    return (
+                      <div key={item.id} className="p-4 sm:p-6 flex">
+                        <div className="flex items-start">
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.has(item.id)}
+                            onChange={() => toggleItemSelection(item.id)}
+                            className="h-5 w-5 text-cyan-600 rounded border-gray-300 focus:ring-cyan-500 mr-3 mt-1"
+                            aria-label={`Select ${displayName}`}
                           />
+                          <div className="relative h-24 w-24 sm:h-32 sm:w-32 flex-shrink-0 rounded-md overflow-hidden bg-gray-100 dark:bg-gray-700">
+                            <Image
+                              src={item.image}
+                              alt={displayName}
+                              fill
+                              className="object-contain p-2"
+                              sizes="100vw"
+                            />
+                          </div>
                         </div>
-                      </div>
-                      <div className="ml-4 sm:ml-6 flex-1 flex flex-col">
-                        <div className="flex justify-between">
-                          <div>
-                            <h3 className="text-lg font-medium text-gray-800 dark:text-white line-clamp-2">
-                              {item.name}
-                            </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                              Brand: {item.brand}
+                        <div className="ml-4 sm:ml-6 flex-1 flex flex-col">
+                          <div className="flex justify-between">
+                            <div>
+                              <h3 className="text-lg font-medium text-gray-800 dark:text-white line-clamp-2">
+                                {displayName}
+                              </h3>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                Brand: {item.brand}
+                              </p>
+                              {colorName && (
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                  Color: {colorName}
+                                </p>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="text-gray-400 hover:text-red-500 transition-colors h-6 w-6 flex items-center justify-center"
+                              aria-label={`Remove ${displayName}`}
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+
+                          <div className="mt-4 flex-1 flex items-end justify-between">
+                            <div className="flex items-center border border-gray-200 dark:border-gray-600 rounded-md">
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                disabled={item.quantity <= 1}
+                                className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-30 transition-colors"
+                                aria-label="Decrease quantity"
+                              >
+                                <Minus size={16} />
+                              </button>
+                              <span className="px-4 py-1 text-center w-12">
+                                {item.quantity}
+                              </span>
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                aria-label="Increase quantity"
+                              >
+                                <Plus size={16} />
+                              </button>
+                            </div>
+
+                            <p className="text-lg font-bold text-cyan-600 dark:text-cyan-500">
+                              ${(item.price * item.quantity).toLocaleString()}
                             </p>
                           </div>
-                          <button
-                            onClick={() => removeFromCart(item.id)}
-                            className="text-gray-400 hover:text-red-500 transition-colors h-6 w-6 flex items-center justify-center"
-                            aria-label="Remove item"
-                          >
-                            <X size={18} />
-                          </button>
-                        </div>
-
-                        <div className="mt-4 flex-1 flex items-end justify-between">
-                          <div className="flex items-center border border-gray-200 dark:border-gray-600 rounded-md">
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              disabled={item.quantity <= 1}
-                              className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-30 transition-colors"
-                              aria-label="Decrease quantity"
-                            >
-                              <Minus size={16} />
-                            </button>
-                            <span className="px-4 py-1 text-center w-12">
-                              {item.quantity}
-                            </span>
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="px-3 py-1 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                              aria-label="Increase quantity"
-                            >
-                              <Plus size={16} />
-                            </button>
-                          </div>
-
-                          <p className="text-lg font-bold text-cyan-600 dark:text-cyan-500">
-                            ${(item.price * item.quantity).toLocaleString()}
-                          </p>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -260,7 +272,11 @@ export default function CartPage() {
                 <button
                   onClick={handleCheckout}
                   disabled={!hasSelectedItems}
-                  className={`w-full text-center px-6 py-3 ${hasSelectedItems ? 'bg-cyan-600 hover:bg-cyan-700 cursor-pointer' : 'bg-gray-300 cursor-not-allowed'} text-white rounded-lg transition-colors duration-200 font-medium`}
+                  className={`w-full text-center px-6 py-3 ${
+                    hasSelectedItems 
+                      ? 'bg-cyan-600 hover:bg-cyan-700 cursor-pointer' 
+                      : 'bg-gray-300 cursor-not-allowed'
+                  } text-white rounded-lg transition-colors duration-200 font-medium`}
                 >
                   Proceed to Checkout
                 </button>
