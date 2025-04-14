@@ -48,7 +48,8 @@ const SearchBar = ({ mobile = false }: SearchBarProps) => {
           onClick={() => setIsOpen(!isOpen)}
           className="text-gray-700 dark:text-gray-200 hover:text-cyan-600 dark:hover:text-cyan-400"
         >
-          <Search />
+          <Search /> Search here...
+          
         </button>
 
         {isOpen && (
