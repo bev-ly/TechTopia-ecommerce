@@ -44,11 +44,12 @@ const SearchBar = ({ mobile = false }: SearchBarProps) => {
   if (mobile) {
     return (
       <>
-        <button aria-label="Search"
+        <button aria-label="Search laptops"
           onClick={() => setIsOpen(!isOpen)}
           className="text-gray-700 dark:text-gray-200 hover:text-cyan-600 dark:hover:text-cyan-400"
         >
           <Search />
+
 
         </button>
 
@@ -64,7 +65,7 @@ const SearchBar = ({ mobile = false }: SearchBarProps) => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
                 />
-                <button aria-label="Search"
+                <button aria-label="Search submit"
                   type="submit"
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-cyan-600 dark:hover:text-cyan-400"
                 >
@@ -93,7 +94,7 @@ const SearchBar = ({ mobile = false }: SearchBarProps) => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <button aria-label="Search"
+        <button aria-label="Search laptops"
           type="submit"
           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-cyan-600 dark:hover:text-cyan-400"
         >
