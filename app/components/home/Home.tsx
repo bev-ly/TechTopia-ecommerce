@@ -16,13 +16,13 @@ export default function HomePage() {
     { 
       name: "Dell XPS", 
       href: "/products/dell",
-      image: "/brands/dell-logo.png",
+      image: "/dell.webp",
       alt: "Dell Logo"
     },
     { 
       name: "HP Spectre", 
       href: "/products/hp",
-      image: "/brands/hp-logo.png",
+      image: "/hp.webp",
       alt: "HP Logo"
     },
     { 
@@ -50,22 +50,22 @@ export default function HomePage() {
       name: "MacBook Pro 16\" M3 Max",
       description: "12-core CPU, 40-core GPU, 64GB unified memory",
       price: "$3,899",
-      href: "/products/macbook-pro-16-m3max",
-      image: "/apple16.webp"
+      href: "/macbook-pro-14in-2024-m4-pro-m4-max-colors.webp",
+      image: "/macbook-pro-14in-2024-m4-pro-m4-max-colors.webp"
     },
     {
       name: "Dell XPS 15 (2024)",
       description: "Intel Core i9, 32GB RAM, 1TB SSD, OLED 4K",
       price: "$2,499",
       href: "/products/dell-xps-15-2024",
-      image: "/laptops/dell-xps-15.png"
+      image: "/dell.webp"
     },
     {
       name: "HP Spectre x360 14",
       description: "2-in-1 convertible, 13th Gen Intel, 16GB RAM",
       price: "$1,599",
       href: "/products/hp-spectre-x360-14",
-      image: "/laptops/hp-spectre-x360.png"
+      image: "/hp.webp"
     }
   ];
 
